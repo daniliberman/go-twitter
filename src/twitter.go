@@ -29,10 +29,14 @@ func main() {
 			text := c.ReadLine()
 
 			tweet := domain.NewTweet(user, text)
-			service.PublishTweet(tweet)
+			error := service.PublishTweet(tweet)
 
-			c.Print("Tweet sent\n")
-
+			if error == nil {
+				c.Print("Tweet sent\n")
+			} else {
+				c.Print("Tweet faild\n")
+			}
+			
 			return
 		},
 	})
