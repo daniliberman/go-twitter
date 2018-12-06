@@ -7,12 +7,15 @@ import (
 )
 
 // Initialization of users slice
-var users []domain.User
+var users []*domain.User
 
 func AddUser(user *domain.User) error{
-	users = append(users, *user)
+	users = append(users, user)
 	
-
 	return nil
 //	return fmt.Errorf("adding user faild")
+}
+
+func GetUsers() []*domain.User {
+	return users
 }

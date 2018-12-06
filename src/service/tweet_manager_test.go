@@ -9,16 +9,6 @@ import (
 )
 
 func TestPublishedTweetIsSaved(t *testing.T) {
-	
-	/*
-	var tweet string = "This is my first tweet"
-
-	service.PublishTweet(tweet)
-
-	if service.GetTweet() != tweet {
-		t.Error("Expected tweet is", tweet)
-	}
-	*/
 
 	//initialization
 	var tweet *domain.Tweet

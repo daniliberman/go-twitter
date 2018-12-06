@@ -77,6 +77,54 @@ func main() {
 		},
 	})
 
+	shell.AddCmd(&ishell.Cmd{
+		Name: "addUser",
+		Help: "adds new twitter user",
+		Func: func(c *ishell.Context) {
+
+			defer c.ShowPrompt(true)
+
+			//name, mail, nick, pass
+			c.Print("Write the name: ")
+			name := c.ReadLine()
+
+			c.Print("Write the mail: ")
+			mail := c.ReadLine()
+
+			c.Print("Write the nick: ")
+			nick := c.ReadLine()
+
+			c.Print("Write the password: ")
+			pass := c.ReadLine()
+
+			user := domain.NewUser(name, mail, nick, pass)
+			error := service.AddUser(user)
+
+			if error == nil {
+				c.Printf("User %s was added\n", nick)
+			} else {
+				c.Print("Adding user faild\n")
+			}
+			return
+		},
+	})
+
+	shell.AddCmd(&ishell.Cmd{
+		Name: "showUsers",
+		Help: "Shows all users",
+		Func: func(c *ishell.Context) {
+
+			defer c.ShowPrompt(true)
+
+			users := service.GetUsers()
+
+			for i := 0 ; i < len(users); i++ {
+				c.Println(users[i].Nick)
+			}
+			return
+		},
+	})
+
 	shell.Run()
 
 }

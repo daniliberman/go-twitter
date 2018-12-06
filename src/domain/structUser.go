@@ -1,18 +1,18 @@
 package domain
 
 type User struct {
-	name string
-	mail string
-	nick string
-	pass string
+	Name string
+	Mail string
+	Nick string
+	Pass string
 }
 
 func NewUser(name string, mail string, nick string, pass string) *User{
 	var user User
-	user.name = name
-	user.mail = mail
-	user.nick = nick
-	user.pass = pass
+	user.Name = name
+	user.Mail = mail
+	user.Nick = nick
+	user.Pass = pass
 
 	return &user
 }
