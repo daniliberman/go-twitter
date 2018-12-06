@@ -196,3 +196,60 @@ func TestCantPublishIfUserDoesNotExist(t * testing.T) {
 	}
 	return	
 }
+
+func TestGetTweetsByUser(t * testing.T) {
+	// Initialization
+	service.InitializeServiceTweet()
+	service.InitializeServiceUser()
+	user1 := domain.NewUser("user1", "user1@mail.com", "user1Nick", "password")
+	service.AddUser(user1)
+	user2 := domain.NewUser("user2", "user2@mail.com", "user2Nick", "password")
+	service.AddUser(user2)
+	textsToTweetByUser1 := []string{"primer tweet de user1", "segundo tweet de user1", "tercer tweet de user1"}
+
+	// Operation
+	for _, textToTweet := range textsToTweetByUser1 {
+		domain.NewTweet(user1, textToTweet)
+	}
+	text4 := "primer tweet de user2"
+	domain.NewTweet(user2, text4)
+
+	tweetsFromUser1,_ := service.GetTweetsByUser(user1)
+
+	for i, tweet := range tweetsFromUser1 {
+		if(tweet.Text != textsToTweetByUser1[i]) {
+			t.Errorf("no match in texts: expected %s but was %s", textsToTweetByUser1[i], tweet.Text)
+		}
+	}
+}
+
+func TestGetTweetsByUserReturnsErrorIfUserDoesNotExist(t *testing.T) {
+	// Initialization
+	service.InitializeServiceTweet()
+	service.InitializeServiceUser()
+	user1 := domain.NewUser("user1", "user1@mail.com", "user1Nick", "password")
+
+	// Operation
+	_, err := service.GetTweetsByUser(user1)
+
+	// Validation
+	if err != nil && err.Error() != "User does not exist" {
+		t.Error("Expected error if user does not exist")
+	}
+}
+
+func TestGetTweetsByUserReturnsErrorIfUserHasNoTweets(t *testing.T) {
+	// Initialization
+	service.InitializeServiceTweet()
+	service.InitializeServiceUser()
+	user1 := domain.NewUser("user1", "user1@mail.com", "user1Nick", "password")
+	service.AddUser(user1)
+
+	// Operation
+	_, err := service.GetTweetsByUser(user1)
+
+	// Validation
+	if err != nil && err.Error() != "User had not tweet yet" {
+		t.Error("Expected error if user had not tweet yet")
+	}
+}

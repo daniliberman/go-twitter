@@ -9,9 +9,11 @@ import (
 // Initialization of tweets slice
 var tweets []*domain.Tweet
 var nextId int
+var tweetsByUsers map[*domain.User][]*domain.Tweet
 
 func InitializeServiceTweet() {
 	tweets = make([]*domain.Tweet, 0) 
+	tweetsByUsers = make(map[*domain.User][]*domain.Tweet) 
 	nextId = 0
 }
 
@@ -45,6 +47,7 @@ func PublishTweet(tweet *domain.Tweet) (int,error) {
 	nextId = nextId+1
 
 	tweets = append(tweets, tweet)
+	tweetsByUsers[tweet.User] = append(tweetsByUsers[tweet.User], tweet)
 
 	return tweet.Id, nil
 }
@@ -62,4 +65,20 @@ func GetTweetById(id int) *domain.Tweet {
 		}
 	}
 	return nil
+}
+
+func GetTweetsByUser(user *domain.User) ([]*domain.Tweet, error) {
+
+	userFound := GetUserWithNick(user.Nick)
+	if userFound == nil {
+		return nil, fmt.Errorf("User does not exist")	
+	}
+
+	tweetsForUser := tweetsByUsers[user]
+
+	if tweetsForUser == nil {
+		return nil, fmt.Errorf("User had not tweet yet")
+	}
+
+	return tweetsByUsers[user], nil
 }

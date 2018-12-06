@@ -4,7 +4,6 @@ import (
 	"time"
 )
 
-
 type Tweet struct {
 	User *User
 	Text string

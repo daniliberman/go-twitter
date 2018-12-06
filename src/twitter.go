@@ -13,6 +13,8 @@ func main() {
 	shell.SetPrompt("Tweeter >> ")
 	shell.Print("Type 'help' to know commands\n")
 
+	service.InitializeServiceTweet()
+	service.InitializeServiceUser()
 	shell.AddCmd(&ishell.Cmd{
 		Name: "publishTweet",
 		Help: "Publishes a tweet",
@@ -60,6 +62,37 @@ func main() {
 				c.Println("[" + strconv.Itoa(tweets[i].Id) + "]" + tweets[i].User.Nick + ": " + tweets[i].Text)
 			}
 
+			return
+		},
+	})
+
+	shell.AddCmd(&ishell.Cmd{
+		Name: "showTweetsForUser",
+		Help: "Shows all tweets for a specific user",
+		Func: func(c *ishell.Context) {
+
+			defer c.ShowPrompt(true)
+
+			c.Print("Write your user's nick: ")
+
+			nick := c.ReadLine()
+			user := service.GetUserWithNick(nick)
+
+			if user == nil {
+				c.Printf("User with nick: %s does not exist\n", nick)
+				return
+			}
+
+			tweetsForUser, err := service.GetTweetsByUser(user)
+
+			if err == nil {
+				c.Printf("Tweets for user %s:\n", nick)
+				for i,tweet := range(tweetsForUser) {
+					c.Printf("[%d] %s\n", i, tweet.Text)
+				}
+			} else {
+				c.Printf("%s\n", err)
+			}
 			return
 		},
 	})
