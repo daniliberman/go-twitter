@@ -4,7 +4,7 @@ import (
 	"github.com/abiosoft/ishell"
 	"github.com/daniliberman/twitter/src/service"
 	"github.com/daniliberman/twitter/src/domain"
-
+	"strconv"
 )
 
 func main() {
@@ -29,10 +29,10 @@ func main() {
 			text := c.ReadLine()
 
 			tweet := domain.NewTweet(user, text)
-			error := service.PublishTweet(tweet)
+			id, error := service.PublishTweet(tweet)
 
 			if error == nil {
-				c.Print("Tweet sent\n")
+				c.Printf("Tweet %d sent\n", id)
 			} else {
 				c.Print("Tweet faild\n")
 			}
@@ -51,8 +51,27 @@ func main() {
 			tweets := service.GetTweets()
 
 			for i := 0 ; i < len(tweets); i++ {
-				c.Println(tweets[i].User + ": " + tweets[i].Text)
+				c.Println("[" + strconv.Itoa(tweets[i].Id) + "]" + tweets[i].User + ": " + tweets[i].Text)
 			}
+
+			return
+		},
+	})
+
+	shell.AddCmd(&ishell.Cmd{
+		Name: "showTweetById",
+		Help: "Shows the tweet identified by an id",
+		Func: func(c *ishell.Context) {
+
+			defer c.ShowPrompt(true)
+
+			c.Print("Write the id: ")
+
+			id, _ := strconv.Atoi(c.ReadLine())
+
+			tweet := service.GetTweetById(id)
+
+			c.Println(tweet.User + ": " + tweet.Text)
 
 			return
 		},

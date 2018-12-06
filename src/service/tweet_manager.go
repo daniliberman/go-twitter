@@ -8,9 +8,11 @@ import (
 
 // Initialization of tweets slice
 var tweets []*domain.Tweet
+var nextId int
 
 func InitializeServiceTweet() {
 	tweets = make([]*domain.Tweet, 0) 
+	nextId = 0
 }
 
 func AddTweet(tweet *domain.Tweet) error{
@@ -19,29 +21,41 @@ func AddTweet(tweet *domain.Tweet) error{
 //	return fmt.Errorf("adding tweet faild")
 }
 
-func PublishTweet(tweet *domain.Tweet) error{
+func PublishTweet(tweet *domain.Tweet) (int,error) {
 	if tweet.User == "" {
-		return fmt.Errorf("user is required")	
+		return -1, fmt.Errorf("user is required")	
 	}
 
 	if tweet.Text == "" {
-		return fmt.Errorf("text is required")	
+		return -1, fmt.Errorf("text is required")	
 	}
 
 	length := len(tweet.Text)
 	if length > 140 {
-		return fmt.Errorf("text exceeds 140 characters")
+		return -1, fmt.Errorf("text exceeds 140 characters")
 	}
 
 	date := time.Now()
 	tweet.Date = &date
+	tweet.Id = nextId
+	nextId = nextId+1
 
 	tweets = append(tweets, tweet)
 
-	return nil
+	return tweet.Id, nil
 }
 
 func GetTweets() []*domain.Tweet {
 	return tweets;
 }
 
+func GetTweetById(id int) *domain.Tweet {
+	var tweet *domain.Tweet
+	for i := 0; i < len(GetTweets()); i++ {
+		tweet = GetTweets()[i];
+		if(tweet.Id == id){
+			return tweet
+		}
+	}
+	return nil
+}

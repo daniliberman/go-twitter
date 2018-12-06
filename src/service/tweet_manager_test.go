@@ -53,7 +53,7 @@ func TestTweetWithoutUserIsNotPublished(t *testing.T) {
 
 	//Operation
 	var err error
-	err = service.PublishTweet(tweet)
+	_, err = service.PublishTweet(tweet)
 
 	//Validation
 	if err != nil && err.Error() != "user is required" {
@@ -72,7 +72,7 @@ func TestTweetWithoutTextIsNotPublished(t *testing.T) {
 
 	//Operation
 	var err error
-	err = service.PublishTweet(tweet)
+	_, err = service.PublishTweet(tweet)
 
 	//Validation
 	if err != nil && err.Error() != "text is required" {
@@ -91,7 +91,7 @@ func TestTweetWhichExceeding140CharactersIsNotPublished(t *testing.T) {
 
 	//Operation
 	var err error
-	err = service.PublishTweet(tweet)
+	_, err = service.PublishTweet(tweet)
 
 	//Validation
 	if err != nil && err.Error() != "text exceeds 140 characters" {
@@ -120,16 +120,16 @@ func TestCanPublishAndRetrieveMoreThanOneTweet(t *testing.T) {
 	
 	firstPublishedTweet := publishedTweets[0]
 	seccondPublishedTweet := publishedTweets[1]
-	if !isValidTweet(t, firstPublishedTweet, tweet.User, tweet.Text) {
+	if !isValidTweet(t, firstPublishedTweet, 0, tweet.User, tweet.Text) {
 		return
 	}
-	if !isValidTweet(t, seccondPublishedTweet, seccondTweet.User, seccondTweet.Text) {
+	if !isValidTweet(t, seccondPublishedTweet, 1, seccondTweet.User, seccondTweet.Text) {
 		return
 	}
 
 }
 
-func isValidTweet(t *testing.T, tweet *domain.Tweet, user string, text string) bool {
+func isValidTweet(t *testing.T, tweet *domain.Tweet, id int, user string, text string) bool {
 	if tweet.User != user {
 		t.Error("no match in users")
 		return false
@@ -138,5 +138,30 @@ func isValidTweet(t *testing.T, tweet *domain.Tweet, user string, text string) b
 		t.Error("no match in texts")
 		return false
 	}
+	if tweet.Id != id {
+		t.Error("no match in ids")
+		return false
+	}
 	return true
+}
+
+func TestCanRetrieveTweetById(t * testing.T) {
+	// Initialization
+	service.InitializeServiceTweet()
+
+	var tweet *domain.Tweet
+	var id int
+
+	user := "danidani"
+	text := "this is my first tweet"
+
+	tweet = domain.NewTweet(user, text)
+
+	// Operation
+	id, _ = service.PublishTweet(tweet)
+
+	// Validaiton
+	publishedTweet := service.GetTweetById(id)
+
+	isValidTweet(t, publishedTweet, id, user, text)
 }
