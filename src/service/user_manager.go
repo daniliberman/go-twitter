@@ -7,24 +7,16 @@ import (
 	"reflect"
 )
 
-// Initialization of users slice
-var users []*domain.User
-var loggedInUsers []*domain.User
 
-
-func AddUser(user *domain.User) error{
-	users = append(users, user)
+func (tweetManager *TweetManager)AddUser(user *domain.User) error{
+	tweetManager.Users = append(tweetManager.Users, user)
 	
 	return nil
 //	return fmt.Errorf("adding user faild")
 }
 
-func InitializeServiceUser() {
-	users = make([]*domain.User, 0) 
-}
-
-func GetUsers() []*domain.User {
-	return users
+func (tweetManager *TweetManager)GetUsers() []*domain.User {
+	return tweetManager.Users
 }
 
 func CompareUsers(user1 *domain.User, user2 *domain.User) bool{
@@ -32,8 +24,8 @@ func CompareUsers(user1 *domain.User, user2 *domain.User) bool{
 }
 
 // If user does not exist returns nil
-func GetUserWithNick(nick string) *domain.User {
-	for _, user := range users {
+func (tweetManager *TweetManager)GetUserWithNick(nick string) *domain.User {
+	for _, user := range tweetManager.Users {
 		if user.Nick == nick {
 			return user
 		}
@@ -41,21 +33,21 @@ func GetUserWithNick(nick string) *domain.User {
 	return nil
 }
 
-func Login(nick string, pass string) error{
-	user := GetUserWithNick(nick)
+func (tweetManager *TweetManager)Login(nick string, pass string) error{
+	user := tweetManager.GetUserWithNick(nick)
 	if user == nil || user.Pass != pass {
 		return fmt.Errorf("Wrong nick or password")
 	}
-	loggedInUsers = append(loggedInUsers, user)
+	tweetManager.LoggedInUsers = append(tweetManager.LoggedInUsers, user)
 	return nil
 }
 
-func GetLoggedInUsers() []*domain.User {
-	return loggedInUsers
+func (tweetManager *TweetManager)GetLoggedInUsers() []*domain.User {
+	return tweetManager.LoggedInUsers
 }
 
-func IsUserLoggedIn(user *domain.User) bool {
-	for _,currentUser := range GetLoggedInUsers() {
+func (tweetManager *TweetManager)IsUserLoggedIn(user *domain.User) bool {
+	for _,currentUser := range tweetManager.GetLoggedInUsers() {
 		if(CompareUsers(user, currentUser)) {
 			return true
 		}

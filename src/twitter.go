@@ -12,9 +12,8 @@ func main() {
 	shell := ishell.New()
 	shell.SetPrompt("Tweeter >> ")
 	shell.Print("Type 'help' to know commands\n")
+	tweetManager := service.NewTweetManager()
 
-	service.InitializeServiceTweet()
-	service.InitializeServiceUser()
 	shell.AddCmd(&ishell.Cmd{
 		Name: "publishTweet",
 		Help: "Publishes a tweet",
@@ -25,7 +24,7 @@ func main() {
 			c.Print("Write your user's nick: ")
 
 			nick := c.ReadLine()
-			user := service.GetUserWithNick(nick)
+			user := tweetManager.GetUserWithNick(nick)
 
 			if user == nil {
 				c.Printf("User with nick: %s does not exist\n", nick)
@@ -37,7 +36,7 @@ func main() {
 			text := c.ReadLine()
 
 			tweet := domain.NewTweet(user, text)
-			id, error := service.PublishTweet(tweet)
+			id, error := tweetManager.PublishTweet(tweet)
 
 			if error == nil {
 				c.Printf("Tweet %d sent\n", id)
@@ -56,7 +55,7 @@ func main() {
 
 			defer c.ShowPrompt(true)
 
-			tweets := service.GetTweets()
+			tweets := tweetManager.GetTweets()
 
 			for i := 0 ; i < len(tweets); i++ {
 				c.Println("[" + strconv.Itoa(tweets[i].Id) + "]" + tweets[i].User.Nick + ": " + tweets[i].Text)
@@ -76,14 +75,14 @@ func main() {
 			c.Print("Write your user's nick: ")
 
 			nick := c.ReadLine()
-			user := service.GetUserWithNick(nick)
+			user := tweetManager.GetUserWithNick(nick)
 
 			if user == nil {
 				c.Printf("User with nick: %s does not exist\n", nick)
 				return
 			}
 
-			tweetsForUser, err := service.GetTweetsByUser(user)
+			tweetsForUser, err := tweetManager.GetTweetsByUser(user)
 
 			if err == nil {
 				c.Printf("Tweets for user %s:\n", nick)
@@ -108,7 +107,7 @@ func main() {
 
 			id, _ := strconv.Atoi(c.ReadLine())
 
-			tweet := service.GetTweetById(id)
+			tweet := tweetManager.GetTweetById(id)
 
 			c.Println(tweet.User.Nick + ": " + tweet.Text)
 
@@ -137,7 +136,7 @@ func main() {
 			pass := c.ReadLine()
 
 			user := domain.NewUser(name, mail, nick, pass)
-			error := service.AddUser(user)
+			error := tweetManager.AddUser(user)
 
 			if error == nil {
 				c.Printf("User %s was added\n", nick)
@@ -155,7 +154,7 @@ func main() {
 
 			defer c.ShowPrompt(true)
 
-			users := service.GetUsers()
+			users := tweetManager.GetUsers()
 
 			for i := 0 ; i < len(users); i++ {
 				c.Println(users[i].Nick)
@@ -177,7 +176,7 @@ func main() {
 			c.Print("Write the password: ")
 			pass := c.ReadLine()
 
-			err := service.Login(nick, pass)
+			err := tweetManager.Login(nick, pass)
 
 			if err == nil {
 				c.Printf("Logged in successful\n")
@@ -197,8 +196,8 @@ func main() {
 
 			c.Print("Write the nick: ")
 			nick := c.ReadLine()
-			user := service.GetUserWithNick(nick)
-			isLoggedIn := service.IsUserLoggedIn(user)
+			user := tweetManager.GetUserWithNick(nick)
+			isLoggedIn := tweetManager.IsUserLoggedIn(user)
 
 			if isLoggedIn {
 				c.Printf("User with nick %s is logged in\n", nick)
