@@ -2,7 +2,6 @@ package service_test
 
 import (
 	"testing"
-
 	"github.com/daniliberman/twitter/src/service"
 	"github.com/daniliberman/twitter/src/domain"
 
@@ -11,20 +10,24 @@ import (
 func TestPublishedTweetIsSaved(t *testing.T) {
 
 	//initialization
-	var tweet *domain.Tweet
-	user := "daniliberman"
+	service.InitializeServiceTweet()
+	service.InitializeServiceUser()
+	user := domain.NewUser("dani", "dani@mail.com", "danidani", "password")
+	service.AddUser(user)
+
 	text := "This is my first tweet"
-	tweet = domain.NewTweet(user, text)
+	tweet := domain.NewTweet(user, text)
 
 	//Operation
 	service.PublishTweet(tweet)
 
 	//Validation
 	publishedTweet := service.GetTweets()[0]
-	if publishedTweet.User != user &&
+	
+	if !service.CompareUsers(publishedTweet.User, user) ||
 		publishedTweet.Text != text {
 			t.Errorf("Expected tweet is %s: %s \nbut is %s: %s", 
-				user, text, publishedTweet.User, publishedTweet.Text)
+				user.Nick, text, publishedTweet.User.Nick, publishedTweet.Text)
 		return	
 	}
 	if publishedTweet.Date == nil {
@@ -34,9 +37,11 @@ func TestPublishedTweetIsSaved(t *testing.T) {
 
 func TestTweetWithoutUserIsNotPublished(t *testing.T) {
 	//Initialization
+	service.InitializeServiceTweet()
+	service.InitializeServiceUser()
 	var tweet *domain.Tweet
 	
-	var user string
+	var user *domain.User
 	text := "this is my first tweet"
 
 	tweet = domain.NewTweet(user, text)
@@ -53,9 +58,13 @@ func TestTweetWithoutUserIsNotPublished(t *testing.T) {
 
 func TestTweetWithoutTextIsNotPublished(t *testing.T) {
 	//Initialization
+	service.InitializeServiceTweet()
+	service.InitializeServiceUser()
 	var tweet *domain.Tweet
-	
-	user := "daniliberman"
+
+	user := domain.NewUser("dani", "dani@mail.com", "danidani", "password")
+	service.AddUser(user)
+
 	var text string
 
 	tweet = domain.NewTweet(user, text)
@@ -72,9 +81,11 @@ func TestTweetWithoutTextIsNotPublished(t *testing.T) {
 
 func TestTweetWhichExceeding140CharactersIsNotPublished(t *testing.T) {
 	//Initialization
+	service.InitializeServiceTweet()
+	service.InitializeServiceUser()
 	var tweet *domain.Tweet
-	
-	user := "daniliberman"
+	user := domain.NewUser("dani", "dani@mail.com", "danidani", "password")
+	service.AddUser(user)
 	text := "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaasaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaasaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaasaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaasaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaasaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaasaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaasaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaasaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaasaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaasaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaasaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaasaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaasaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaasaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaasaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaasaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaasaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 
 	tweet = domain.NewTweet(user, text)
@@ -92,9 +103,16 @@ func TestTweetWhichExceeding140CharactersIsNotPublished(t *testing.T) {
 func TestCanPublishAndRetrieveMoreThanOneTweet(t *testing.T) {
 	// Initialization
 	service.InitializeServiceTweet()
+	service.InitializeServiceUser()
+
 	var tweet, seccondTweet *domain.Tweet
-	tweet = domain.NewTweet("user1", "this is the first tweet")
-	seccondTweet = domain.NewTweet("user2", "this is the seccond tweet")
+	user1 := domain.NewUser("user1", "user2@mail.com", "user1Nick", "password1")
+	service.AddUser(user1)
+	user2 := domain.NewUser("user2", "user2@mail.com", "user2Nick", "password2")
+	service.AddUser(user2)
+
+	tweet = domain.NewTweet(user1, "this is the first tweet")
+	seccondTweet = domain.NewTweet(user2, "this is the seccond tweet")
 
 	// Operation
 	service.PublishTweet(tweet)
@@ -119,9 +137,9 @@ func TestCanPublishAndRetrieveMoreThanOneTweet(t *testing.T) {
 
 }
 
-func isValidTweet(t *testing.T, tweet *domain.Tweet, id int, user string, text string) bool {
-	if tweet.User != user {
-		t.Error("no match in users")
+func isValidTweet(t *testing.T, tweet *domain.Tweet, id int, user *domain.User, text string) bool {
+	if !service.CompareUsers(tweet.User, user) {
+		t.Errorf("no match in users: tweet.User: %s, user: %s", tweet.User.Nick, user.Nick)
 		return false
 	}
 	if tweet.Text != text {
@@ -138,11 +156,14 @@ func isValidTweet(t *testing.T, tweet *domain.Tweet, id int, user string, text s
 func TestCanRetrieveTweetById(t * testing.T) {
 	// Initialization
 	service.InitializeServiceTweet()
+	service.InitializeServiceUser()
 
 	var tweet *domain.Tweet
 	var id int
 
-	user := "danidani"
+	user := domain.NewUser("user", "user@mail.com", "userNick", "password")
+	service.AddUser(user)
+
 	text := "this is my first tweet"
 
 	tweet = domain.NewTweet(user, text)
@@ -154,4 +175,24 @@ func TestCanRetrieveTweetById(t * testing.T) {
 	publishedTweet := service.GetTweetById(id)
 
 	isValidTweet(t, publishedTweet, id, user, text)
+}
+
+func TestCantPublishIfUserDoesNotExist(t * testing.T) {
+	//initialization
+	service.InitializeServiceTweet()
+	service.InitializeServiceUser()
+	user := domain.NewUser("dani", "dani@mail.com", "danidani", "password")
+
+	text := "This is my first tweet"
+	tweet := domain.NewTweet(user, text)
+
+	//Operation
+	var err error
+	_, err = service.PublishTweet(tweet)
+
+	//Validation
+	if err != nil && err.Error() != "user does not exist" {
+		t.Error("Expected error if user does not exist")
+	}
+	return	
 }

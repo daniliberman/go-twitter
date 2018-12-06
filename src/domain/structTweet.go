@@ -6,13 +6,13 @@ import (
 
 
 type Tweet struct {
-	User string
+	User *User
 	Text string
 	Date *time.Time
 	Id int
 }
 
-func NewTweet(user string, text string) *Tweet{
+func NewTweet(user *User, text string) *Tweet{
 	var tweet Tweet
 	tweet.User = user
 	tweet.Text = text

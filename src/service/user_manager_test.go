@@ -17,6 +17,7 @@ func TestRegisterNewUser(t *testing.T) {
 func TestNewUserIsSaved(t *testing.T) {
 
 	//initialization: newUser parameters: name, mail, nick, pass
+	service.InitializeServiceUser()
 	name := "dani"
 	mail := "dani@mail.com"
 	nick := "dliberman"

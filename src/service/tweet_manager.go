@@ -22,8 +22,12 @@ func AddTweet(tweet *domain.Tweet) error{
 }
 
 func PublishTweet(tweet *domain.Tweet) (int,error) {
-	if tweet.User == "" {
+	if tweet.User == nil {
 		return -1, fmt.Errorf("user is required")	
+	}
+
+	if GetUserWithNick(tweet.User.Nick) == nil {
+		return -1, fmt.Errorf("user does not exist")
 	}
 
 	if tweet.Text == "" {

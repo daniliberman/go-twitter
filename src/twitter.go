@@ -20,9 +20,15 @@ func main() {
 
 			defer c.ShowPrompt(true)
 
-			c.Print("Write your user: ")
+			c.Print("Write your user's nick: ")
 
-			user := c.ReadLine()
+			nick := c.ReadLine()
+			user := service.GetUserWithNick(nick)
+
+			if user == nil {
+				c.Printf("User with nick: %s does not exist\n", nick)
+				return
+			}
 
 			c.Print("Write your tweet: ")
 
@@ -34,7 +40,7 @@ func main() {
 			if error == nil {
 				c.Printf("Tweet %d sent\n", id)
 			} else {
-				c.Print("Tweet faild\n")
+				c.Printf("Tweet faild with error: %s\n", error)
 			}
 			
 			return
@@ -51,7 +57,7 @@ func main() {
 			tweets := service.GetTweets()
 
 			for i := 0 ; i < len(tweets); i++ {
-				c.Println("[" + strconv.Itoa(tweets[i].Id) + "]" + tweets[i].User + ": " + tweets[i].Text)
+				c.Println("[" + strconv.Itoa(tweets[i].Id) + "]" + tweets[i].User.Nick + ": " + tweets[i].Text)
 			}
 
 			return
@@ -71,7 +77,7 @@ func main() {
 
 			tweet := service.GetTweetById(id)
 
-			c.Println(tweet.User + ": " + tweet.Text)
+			c.Println(tweet.User.Nick + ": " + tweet.Text)
 
 			return
 		},
