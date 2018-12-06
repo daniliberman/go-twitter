@@ -30,7 +30,7 @@ func TestPublishedTweetIsSaved(t *testing.T) {
 	service.PublishTweet(tweet)
 
 	//Validation
-	publishedTweet := service.GetTweet()
+	publishedTweet := service.GetTweets()[0]
 	if publishedTweet.User != user &&
 		publishedTweet.Text != text {
 			t.Errorf("Expected tweet is %s: %s \nbut is %s: %s", 
@@ -99,9 +99,44 @@ func TestTweetWhichExceeding140CharactersIsNotPublished(t *testing.T) {
 	}
 }
 
+func TestCanPublishAndRetrieveMoreThanOneTweet(t *testing.T) {
+	// Initialization
+	service.InitializeServiceTweet()
+	var tweet, seccondTweet *domain.Tweet
+	tweet = domain.NewTweet("user1", "this is the first tweet")
+	seccondTweet = domain.NewTweet("user2", "this is the seccond tweet")
 
-// func TestRegisterNewUser(t *testing.T) {
-// 	//newUser parameters: name, mail, nick, pass
-// 	user = domain.NewUser("dani", "dani@mail.com", "danidani", "password")
+	// Operation
+	service.PublishTweet(tweet)
+	service.PublishTweet(seccondTweet)
 
-// }
+	// Validation
+	publishedTweets := service.GetTweets()
+	if len(publishedTweets) != 2 {
+		t.Errorf("expected size is 2 but was %d", len(publishedTweets))
+		return
+	}
+	
+	
+	firstPublishedTweet := publishedTweets[0]
+	seccondPublishedTweet := publishedTweets[1]
+	if !isValidTweet(t, firstPublishedTweet, tweet.User, tweet.Text) {
+		return
+	}
+	if !isValidTweet(t, seccondPublishedTweet, seccondTweet.User, seccondTweet.Text) {
+		return
+	}
+
+}
+
+func isValidTweet(t *testing.T, tweet *domain.Tweet, user string, text string) bool {
+	if tweet.User != user {
+		t.Error("no match in users")
+		return false
+	}
+	if tweet.Text != text {
+		t.Error("no match in texts")
+		return false
+	}
+	return true
+}

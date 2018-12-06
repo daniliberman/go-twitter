@@ -1,10 +1,18 @@
 package service
 
 
-// import (
-// 	"container/list"
-// )
+import (
+	//"fmt"
+	"github.com/daniliberman/twitter/src/domain"
+)
 
-// var users *list.List = list.New() 
+// Initialization of users slice
+var users []domain.User
 
-// func addUser()
+func AddUser(user *domain.User) error{
+	users = append(users, *user)
+	
+
+	return nil
+//	return fmt.Errorf("adding user faild")
+}

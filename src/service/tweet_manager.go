@@ -6,29 +6,42 @@ import (
 	"fmt"
 )
 
-var tweet domain.Tweet
+// Initialization of tweets slice
+var tweets []*domain.Tweet
 
-func PublishTweet (tweet2 *domain.Tweet) error{
-	if tweet2.User == "" {
+func InitializeServiceTweet() {
+	tweets = make([]*domain.Tweet, 0) 
+}
+
+func AddTweet(tweet *domain.Tweet) error{
+	tweets = append(tweets, tweet)
+	return nil
+//	return fmt.Errorf("adding tweet faild")
+}
+
+func PublishTweet(tweet *domain.Tweet) error{
+	if tweet.User == "" {
 		return fmt.Errorf("user is required")	
 	}
 
-	if tweet2.Text == "" {
+	if tweet.Text == "" {
 		return fmt.Errorf("text is required")	
 	}
 
-	length := len(tweet2.Text)
+	length := len(tweet.Text)
 	if length > 140 {
 		return fmt.Errorf("text exceeds 140 characters")
 	}
 
-	tweet.User = tweet2.User
-	tweet.Text = tweet2.Text
 	date := time.Now()
 	tweet.Date = &date
+
+	tweets = append(tweets, tweet)
+
 	return nil
 }
 
-func GetTweet () domain.Tweet {
-	return tweet;
+func GetTweets() []*domain.Tweet {
+	return tweets;
 }
+
