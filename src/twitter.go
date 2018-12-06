@@ -164,6 +164,51 @@ func main() {
 		},
 	})
 
+	shell.AddCmd(&ishell.Cmd{
+		Name: "login",
+		Help: "allows user to login",
+		Func: func(c *ishell.Context) {
+
+			defer c.ShowPrompt(true)
+
+			c.Print("Write the nick: ")
+			nick := c.ReadLine()
+
+			c.Print("Write the password: ")
+			pass := c.ReadLine()
+
+			err := service.Login(nick, pass)
+
+			if err == nil {
+				c.Printf("Logged in successful\n")
+			} else {
+				c.Printf("%s\n", err)
+			}
+			return
+		},
+	})
+
+	shell.AddCmd(&ishell.Cmd{
+		Name: "checkLogin",
+		Help: "checks if user is logged in",
+		Func: func(c *ishell.Context) {
+
+			defer c.ShowPrompt(true)
+
+			c.Print("Write the nick: ")
+			nick := c.ReadLine()
+			user := service.GetUserWithNick(nick)
+			isLoggedIn := service.IsUserLoggedIn(user)
+
+			if isLoggedIn {
+				c.Printf("User with nick %s is logged in\n", nick)
+			} else {
+				c.Printf("User with nick %s is not logged in\n", nick)
+			}
+			return
+		},
+	})
+
 	shell.Run()
 
 }

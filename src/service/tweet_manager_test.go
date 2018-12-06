@@ -14,6 +14,7 @@ func TestPublishedTweetIsSaved(t *testing.T) {
 	service.InitializeServiceUser()
 	user := domain.NewUser("dani", "dani@mail.com", "danidani", "password")
 	service.AddUser(user)
+	service.Login(user.Nick, user.Pass)
 
 	text := "This is my first tweet"
 	tweet := domain.NewTweet(user, text)
@@ -64,6 +65,7 @@ func TestTweetWithoutTextIsNotPublished(t *testing.T) {
 
 	user := domain.NewUser("dani", "dani@mail.com", "danidani", "password")
 	service.AddUser(user)
+	service.Login(user.Nick, user.Pass)
 
 	var text string
 
@@ -86,6 +88,7 @@ func TestTweetWhichExceeding140CharactersIsNotPublished(t *testing.T) {
 	var tweet *domain.Tweet
 	user := domain.NewUser("dani", "dani@mail.com", "danidani", "password")
 	service.AddUser(user)
+	service.Login(user.Nick, user.Pass)
 	text := "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaasaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaasaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaasaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaasaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaasaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaasaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaasaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaasaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaasaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaasaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaasaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaasaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaasaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaasaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaasaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaasaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaasaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 
 	tweet = domain.NewTweet(user, text)
@@ -110,6 +113,8 @@ func TestCanPublishAndRetrieveMoreThanOneTweet(t *testing.T) {
 	service.AddUser(user1)
 	user2 := domain.NewUser("user2", "user2@mail.com", "user2Nick", "password2")
 	service.AddUser(user2)
+	service.Login(user1.Nick, user1.Pass)
+	service.Login(user2.Nick, user2.Pass)
 
 	tweet = domain.NewTweet(user1, "this is the first tweet")
 	seccondTweet = domain.NewTweet(user2, "this is the seccond tweet")
@@ -163,6 +168,7 @@ func TestCanRetrieveTweetById(t * testing.T) {
 
 	user := domain.NewUser("user", "user@mail.com", "userNick", "password")
 	service.AddUser(user)
+	service.Login(user.Nick, user.Pass)
 
 	text := "this is my first tweet"
 
@@ -193,6 +199,28 @@ func TestCantPublishIfUserDoesNotExist(t * testing.T) {
 	//Validation
 	if err != nil && err.Error() != "user does not exist" {
 		t.Error("Expected error if user does not exist")
+	}
+	return	
+}
+
+
+func TestCantPublishIfUserDoesIsNotLoggedIn(t * testing.T) {
+	//initialization
+	service.InitializeServiceTweet()
+	service.InitializeServiceUser()
+	user := domain.NewUser("dani", "dani@mail.com", "danidani", "password")
+	service.AddUser(user)
+
+	text := "This is my first tweet"
+	tweet := domain.NewTweet(user, text)
+
+	//Operation
+	var err error
+	_, err = service.PublishTweet(tweet)
+
+	//Validation
+	if err != nil && err.Error() != "user is not logged in" {
+		t.Errorf("Expected error if user is not logged in and got %s", err)
 	}
 	return	
 }

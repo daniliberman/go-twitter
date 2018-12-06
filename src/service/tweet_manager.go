@@ -32,6 +32,10 @@ func PublishTweet(tweet *domain.Tweet) (int,error) {
 		return -1, fmt.Errorf("user does not exist")
 	}
 
+	if !IsUserLoggedIn(tweet.User){
+		return -1, fmt.Errorf("user is not logged in")
+	}
+
 	if tweet.Text == "" {
 		return -1, fmt.Errorf("text is required")	
 	}

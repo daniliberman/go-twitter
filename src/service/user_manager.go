@@ -2,13 +2,15 @@ package service
 
 
 import (
-	//"fmt"
+	"fmt"
 	"github.com/daniliberman/twitter/src/domain"
 	"reflect"
 )
 
 // Initialization of users slice
 var users []*domain.User
+var loggedInUsers []*domain.User
+
 
 func AddUser(user *domain.User) error{
 	users = append(users, user)
@@ -39,3 +41,24 @@ func GetUserWithNick(nick string) *domain.User {
 	return nil
 }
 
+func Login(nick string, pass string) error{
+	user := GetUserWithNick(nick)
+	if user == nil || user.Pass != pass {
+		return fmt.Errorf("Wrong nick or password")
+	}
+	loggedInUsers = append(loggedInUsers, user)
+	return nil
+}
+
+func GetLoggedInUsers() []*domain.User {
+	return loggedInUsers
+}
+
+func IsUserLoggedIn(user *domain.User) bool {
+	for _,currentUser := range GetLoggedInUsers() {
+		if(CompareUsers(user, currentUser)) {
+			return true
+		}
+	}
+	return false
+}

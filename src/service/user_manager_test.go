@@ -36,3 +36,55 @@ func TestNewUserIsSaved(t *testing.T) {
 		return	
 	}
 }
+
+func TestLoginUserOK(t *testing.T) {
+	//Initialization
+	service.InitializeServiceUser()
+	name := "dani"
+	mail := "dani@mail.com"
+	nick := "dliberman"
+	pass := "password1"
+	user := domain.NewUser(name, mail, nick, pass)
+	service.AddUser(user)
+	
+	err := service.Login(nick, pass)
+	if err != nil {
+		t.Errorf("TestLoginUserOK faild with error: %s", err)
+	}
+}
+
+func TestLoginUserFaildWithWrongNick(t *testing.T) {
+	//Initialization
+	service.InitializeServiceUser()
+	name := "dani"
+	mail := "dani@mail.com"
+	nick := "dliberman"
+	pass := "password1"
+	user := domain.NewUser(name, mail, nick, pass)
+	service.AddUser(user)
+	
+	err := service.Login("otro nick", pass)
+	//Validation
+	
+	if err != nil && err.Error() != "Wrong nick or password" {
+		t.Error("Expected error if wrong nick or password")
+	}
+}
+
+func TestLoginUserFaildWithWrongPass(t *testing.T) {
+	//Initialization
+	service.InitializeServiceUser()
+	name := "dani"
+	mail := "dani@mail.com"
+	nick := "dliberman"
+	pass := "password1"
+	user := domain.NewUser(name, mail, nick, pass)
+	service.AddUser(user)
+	
+	err := service.Login(nick, "otraPass")
+	//Validation
+	
+	if err != nil && err.Error() != "Wrong nick or password" {
+		t.Error("Expected error if wrong nick or password")
+	}
+}
