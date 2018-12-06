@@ -18,3 +18,12 @@ func NewTweet(user *User, text string) *Tweet{
 
 	return &tweet
 }
+
+func (tweet Tweet)String() string{
+	str := "@"
+	str += tweet.User.Nick
+	str += ": "
+	str += tweet.Text
+
+	return str
+}

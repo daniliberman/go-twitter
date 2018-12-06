@@ -280,3 +280,18 @@ func TestGetTweetsByUserReturnsErrorIfUserHasNoTweets(t *testing.T) {
 		t.Error("Expected error if user had not tweet yet")
 	}
 }
+
+func TestCanGetAPrintableTweet(t *testing.T) {
+	// Initialization
+	user1 := domain.NewUser("user1", "user1@mail.com", "user1Nick", "password")
+	tweet := domain.NewTweet(user1, "this is my tweet")
+
+	// Operation
+	text := tweet.String()
+
+	// Validation
+	expectedText := "@user1Nick: this is my tweet"
+	if text != expectedText {
+		t.Errorf("the expected text is %s but was %s", expectedText, text)
+	}
+}
