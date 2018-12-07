@@ -4,6 +4,7 @@ import (
 	"github.com/daniliberman/twitter/src/domain"
 	"time"
 	"fmt"
+	"strings"
 )
 
 type TweetManager struct {
@@ -93,4 +94,21 @@ func (tweetManager *TweetManager)GetTweetsByUser(user *domain.User) ([]domain.Tw
 	}
 
 	return tweetManager.TweetsByUsers[user], nil
+}
+
+func (tweetManager *TweetManager)SearchTweetsContaining(query string, searchResult chan domain.Tweet) {
+	foundAny := false
+	go func() {
+		for _,tweet := range tweetManager.GetTweets() {
+			if strings.Contains(tweet.GetText(), query) {
+				searchResult <- tweet
+				foundAny = true
+			}
+		}
+		if !foundAny {
+			searchResult <- nil
+		}
+		
+		close(searchResult)
+	}()
 }

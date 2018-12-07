@@ -5,7 +5,7 @@ import (
 	"github.com/daniliberman/twitter/src/service"
 	"github.com/daniliberman/twitter/src/domain"
 	"reflect"
-
+	"strings"
 )
 
 // TEXT TWEET
@@ -371,25 +371,33 @@ func TestCanGetAPrintableTweet(t *testing.T) {
 	}
 }
 
-// func TestPublishedTweetIsSavedToExternalResource(t *testing.T) {
-// 	// Initialization
-// 	var tweetWriter service.TweetWriter
-// 	tweetWriter = service.NewMemoryTweetWriter() // Mock implementation
-// 	tweetManager := service.NewTweetManager(tweetWriter)
+func TestCanSearchForTweetContainingText(t *testing.T) {
+    // Initialization
+    tweetWriter := service.NewMemoryTweetWriter()
+	tweetManager := service.NewTweetManager()
+	tweetManager.TweetWriter = tweetWriter
+    // Create and publish a tweet
 
-// 	var tweet domain.Tweet // Fill the tweet with data
-	
-// 	// Operation
-// 	id, _ := tweetManager.PublishTweet(tweet)
+	var tweet *domain.TextTweet
+	user := domain.NewUser("user", "user@mail.com", "userNick", "password")
+	tweetManager.AddUser(user)
+	tweetManager.Login(user.Nick, user.Pass)
+	text := "this is my first tweet"
+	tweet = domain.NewTextTweet(user, text)
+	tweetManager.PublishTweet(tweet)
 
-// 	// Validation
-// 	memoryWriter := (tweetWriter).(*service.MemoryTweetWriter)
-// 	savedTweet := memoryWriter.GetLastSavedTweet()
+    // Operation
+    searchResult := make(chan domain.Tweet)
+    query := "first"
+    tweetManager.SearchTweetsContaining(query, searchResult)
 
-// 	if savedTweet == nil {
-// 		//TODO
-// 	}
-// 	if savedTweet.GetIt() != id {
-// 		//TODO
-// 	}
-// }
+    // Validation
+    foundTweet := <-searchResult
+
+    if foundTweet == nil {
+		t.Errorf("expected to find tweet: %s but found nothing", tweet.String())
+	}
+    if !strings.Contains(foundTweet.GetText(), query) {
+		t.Errorf("found wrong tweet: '%s', it does not contain query: '%s'", tweet.String(), query)
+	}
+}

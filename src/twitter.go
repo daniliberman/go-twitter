@@ -257,6 +257,29 @@ func main() {
 		},
 	})
 
+	shell.AddCmd(&ishell.Cmd{
+		Name: "tweetsWithQuote",
+		Help: "finds all tweets with specific quote",
+		Func: func(c *ishell.Context) {
+
+			defer c.ShowPrompt(true)
+
+			c.Print("Write the quote: ")
+			quote := c.ReadLine()
+
+			searchResult := make(chan domain.Tweet)
+			tweetManager.SearchTweetsContaining(quote, searchResult)
+			go func() {
+				for toPrint := range searchResult {
+					if toPrint != nil {
+						c.Printf("%s\n", toPrint.String())
+					}			
+				}
+			}()
+			return
+		},
+	})
+
 	shell.Run()
 
 }

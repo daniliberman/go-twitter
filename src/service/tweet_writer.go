@@ -16,21 +16,21 @@ type FileTweetWriter struct {
 }
 //////////////////////////////////////////////////////////////////////////////
 
-// type MemoryTweetWriter struct {
-// 	lastTweet domain.Tweet
-// }
+type MemoryTweetWriter struct {
+	lastTweet domain.Tweet
+}
 
-// func NewMemoryTweetWriter() *MemoryTweetWriter {
-// 	return &MemoryTweetWriter{}
-// }
+func NewMemoryTweetWriter() *MemoryTweetWriter {
+	return &MemoryTweetWriter{}
+}
 
-// func (m *MemoryTweetWriter) Write(tweet domain.Tweet) {
-// 	m.lastTweet = tweet
-// }
+func (m *MemoryTweetWriter) WriteTweet(tweet domain.Tweet) {
+	m.lastTweet = tweet
+}
 
-// func (m *MemoryTweetWriter) GetLastSavedTweet() domain.Tweet {
-// 	return m.lastTweet
-// }
+func (m *MemoryTweetWriter) GetLastSavedTweet() domain.Tweet {
+	return m.lastTweet
+}
 
 //////////////////////////////////////////////////////////////////////////////
 
