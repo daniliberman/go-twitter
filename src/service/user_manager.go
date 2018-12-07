@@ -42,6 +42,28 @@ func (tweetManager *TweetManager)Login(nick string, pass string) error{
 	return nil
 }
 
+func (tweetManager *TweetManager)Logout(nick string) error{
+	user := tweetManager.GetUserWithNick(nick)
+	if user == nil || !tweetManager.IsUserLoggedIn(user){
+		return fmt.Errorf("User with nick '%s' is not logged in", nick)
+	}
+
+	var index int
+	for i, loggedInUser := range tweetManager.LoggedInUsers {
+		if CompareUsers(loggedInUser, user) {
+			index = i
+		}
+	}
+	var firstLoggedInSlice []*domain.User
+	var seccondLoggedInSlice []*domain.User
+	firstLoggedInSlice = append(firstLoggedInSlice, tweetManager.LoggedInUsers[0:index]...)
+	seccondLoggedInSlice = append(seccondLoggedInSlice, tweetManager.LoggedInUsers[index+1:len(tweetManager.LoggedInUsers)]...)
+	tweetManager.LoggedInUsers = firstLoggedInSlice
+	tweetManager.LoggedInUsers = append(tweetManager.LoggedInUsers, seccondLoggedInSlice...)
+
+	return nil
+}
+
 func (tweetManager *TweetManager)GetLoggedInUsers() []*domain.User {
 	return tweetManager.LoggedInUsers
 }

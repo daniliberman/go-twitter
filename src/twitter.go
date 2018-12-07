@@ -216,6 +216,27 @@ func main() {
 	})
 
 	shell.AddCmd(&ishell.Cmd{
+		Name: "logout",
+		Help: "allows user to logout",
+		Func: func(c *ishell.Context) {
+
+			defer c.ShowPrompt(true)
+
+			c.Print("Write the nick: ")
+			nick := c.ReadLine()
+
+			err := tweetManager.Logout(nick)
+
+			if err == nil {
+				c.Printf("Logged out successful\n")
+			} else {
+				c.Printf("%s\n", err)
+			}
+			return
+		},
+	})
+
+	shell.AddCmd(&ishell.Cmd{
 		Name: "checkLogin",
 		Help: "checks if user is logged in",
 		Func: func(c *ishell.Context) {

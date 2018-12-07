@@ -42,8 +42,36 @@ func TestLoginUserOK(t *testing.T) {
 	tweetManager.AddUser(user)
 	
 	err := tweetManager.Login(nick, pass)
+
+	if !tweetManager.IsUserLoggedIn(user) {
+		t.Errorf("User %s should have been logged in, but is not", nick)
+	}
 	if err != nil {
 		t.Errorf("TestLoginUserOK faild with error: %s", err)
+	}
+}
+
+func TestLogoutUserOK(t *testing.T) {
+	//Initialization
+	tweetManager := service.NewTweetManager()
+
+	name := "dani"
+	mail := "dani@mail.com"
+	nick := "dliberman"
+	pass := "password1"
+	user := domain.NewUser(name, mail, nick, pass)
+	tweetManager.AddUser(user)
+	tweetManager.Login(nick, pass)
+
+	// Operation
+	err := tweetManager.Logout(nick)
+
+	// Validation
+	if tweetManager.IsUserLoggedIn(user) {
+		t.Errorf("User %s should have been logged out, but is logged in", nick)
+	}
+	if err != nil {
+		t.Errorf("TestLogoutUserOK faild with error: %s", err)
 	}
 }
 
