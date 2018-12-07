@@ -12,6 +12,7 @@ type TweetManager struct {
 	TweetsByUsers map[*domain.User][]domain.Tweet
 	Users []*domain.User
 	LoggedInUsers []*domain.User
+	TweetWriter TweetWriter
 }
 
 func NewTweetManager() *TweetManager{
@@ -20,6 +21,7 @@ func NewTweetManager() *TweetManager{
 	tweetManager.TweetsByUsers = make(map[*domain.User][]domain.Tweet) 
 	tweetManager.NextId = 0
 	tweetManager.Users = make([]*domain.User, 0) 
+	tweetManager.TweetWriter = NewFileTweetWriter()
 
 	return &tweetManager
 }
@@ -59,6 +61,7 @@ func (tweetManager *TweetManager)PublishTweet(tweet domain.Tweet) (int,error) {
 
 	tweetManager.Tweets = append(tweetManager.Tweets, tweet)
 	tweetManager.TweetsByUsers[tweet.GetUser()] = append(tweetManager.TweetsByUsers[tweet.GetUser()], tweet)
+	tweetManager.TweetWriter.WriteTweet(tweet)
 
 	return tweet.GetId(), nil
 }

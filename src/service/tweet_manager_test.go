@@ -370,3 +370,26 @@ func TestCanGetAPrintableTweet(t *testing.T) {
 		t.Errorf("the expected text is %s but was %s", expectedText, text)
 	}
 }
+
+// func TestPublishedTweetIsSavedToExternalResource(t *testing.T) {
+// 	// Initialization
+// 	var tweetWriter service.TweetWriter
+// 	tweetWriter = service.NewMemoryTweetWriter() // Mock implementation
+// 	tweetManager := service.NewTweetManager(tweetWriter)
+
+// 	var tweet domain.Tweet // Fill the tweet with data
+	
+// 	// Operation
+// 	id, _ := tweetManager.PublishTweet(tweet)
+
+// 	// Validation
+// 	memoryWriter := (tweetWriter).(*service.MemoryTweetWriter)
+// 	savedTweet := memoryWriter.GetLastSavedTweet()
+
+// 	if savedTweet == nil {
+// 		//TODO
+// 	}
+// 	if savedTweet.GetIt() != id {
+// 		//TODO
+// 	}
+// }
