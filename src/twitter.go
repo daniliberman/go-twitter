@@ -31,15 +31,43 @@ func main() {
 				return
 			}
 
-			c.Print("Write your tweet: ")
+			c.Print("Write your tweet's kind:\n TextTweet, ImageTweet or QuoteTweet?\n")
+			tweetsKind := c.ReadLine()
 
+			c.Print("Write your tweet's text: ")
 			text := c.ReadLine()
+			var tweet domain.Tweet
+			switch tweetsKind {
+				case "ImageTweet", "image tweet", "image":
+					c.Print("Enter your image's url: ")
+					url := c.ReadLine()
 
-			tweet := domain.NewTweet(user, text)
-			id, error := tweetManager.PublishTweet(tweet)
+					tweet = domain.NewImageTweet(user, text, url)
+				case "QuoteTweet", "quote tweet", "quote":
+					tweets := tweetManager.GetTweets()
+					
+					c.Print("These are the current tweets:")
+					for i := 0 ; i < len(tweets); i++ {
+						c.Println("[" + strconv.Itoa(tweets[i].GetId()) + "]" + tweets[i].String())
+					}
+					c.Print("Which one would you like to quote? Enter it's id: ")
+					otherTweetId, _ := strconv.Atoi(c.ReadLine())
+					quotedTweet := tweetManager.GetTweetById(otherTweetId)
+					if quotedTweet == nil {
+						c.Printf("Unable to tweet: '%d' is an invalid id!\n", otherTweetId)
+					}
+					tweet = domain.NewQuoteTweet(user, text, quotedTweet)
+				case "TextTweet", "text tweet", "text":
+					tweet = domain.NewTextTweet(user, text)
+				default:
+					c.Printf("Unable to tweet: '%s' is not a kind of tweet!\n", tweetsKind)
+					return
+			}
+
+			_, error := tweetManager.PublishTweet(tweet)
 
 			if error == nil {
-				c.Printf("Tweet %d sent\n", id)
+				c.Printf("Tweet %s sent\n", tweet.String())
 			} else {
 				c.Printf("Tweet faild with error: %s\n", error)
 			}
@@ -58,7 +86,7 @@ func main() {
 			tweets := tweetManager.GetTweets()
 
 			for i := 0 ; i < len(tweets); i++ {
-				c.Println("[" + strconv.Itoa(tweets[i].Id) + "]" + tweets[i].User.Nick + ": " + tweets[i].Text)
+				c.Println("[" + strconv.Itoa(tweets[i].GetId()) + "]" + tweets[i].String())
 			}
 
 			return
@@ -86,8 +114,8 @@ func main() {
 
 			if err == nil {
 				c.Printf("Tweets for user %s:\n", nick)
-				for i,tweet := range(tweetsForUser) {
-					c.Printf("[%d] %s\n", i, tweet.Text)
+				for _,tweet := range(tweetsForUser) {
+					c.Printf("%s\n", tweet.String())
 				}
 			} else {
 				c.Printf("%s\n", err)
@@ -109,7 +137,7 @@ func main() {
 
 			tweet := tweetManager.GetTweetById(id)
 
-			c.Println(tweet.User.Nick + ": " + tweet.Text)
+			c.Println(tweet.String())
 
 			return
 		},

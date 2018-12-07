@@ -7,78 +7,76 @@ import (
 )
 
 type TweetManager struct {
-	Tweets []*domain.Tweet
+	Tweets []domain.Tweet
 	NextId int
-	TweetsByUsers map[*domain.User][]*domain.Tweet
+	TweetsByUsers map[*domain.User][]domain.Tweet
 	Users []*domain.User
 	LoggedInUsers []*domain.User
 }
 
 func NewTweetManager() *TweetManager{
 	var tweetManager TweetManager
-	tweetManager.Tweets = make([]*domain.Tweet, 0) 
-	tweetManager.TweetsByUsers = make(map[*domain.User][]*domain.Tweet) 
+	tweetManager.Tweets = make([]domain.Tweet, 0) 
+	tweetManager.TweetsByUsers = make(map[*domain.User][]domain.Tweet) 
 	tweetManager.NextId = 0
 	tweetManager.Users = make([]*domain.User, 0) 
 
 	return &tweetManager
 }
 
-func (tweetManager *TweetManager)AddTweet(tweet *domain.Tweet) error{
+func (tweetManager *TweetManager)AddTweet(tweet domain.Tweet) error{
 	tweetManager.Tweets = append(tweetManager.Tweets, tweet)
 	return nil
 //	return fmt.Errorf("adding tweet faild")
 }
 
-func (tweetManager *TweetManager)PublishTweet(tweet *domain.Tweet) (int,error) {
-	if tweet.User == nil {
+func (tweetManager *TweetManager)PublishTweet(tweet domain.Tweet) (int,error) {
+	if tweet.GetUser() == nil {
 		return -1, fmt.Errorf("user is required")	
 	}
 
-	if tweetManager.GetUserWithNick(tweet.User.Nick) == nil {
+	if tweetManager.GetUserWithNick(tweet.GetUser().Nick) == nil {
 		return -1, fmt.Errorf("user does not exist")
 	}
 
-	if !tweetManager.IsUserLoggedIn(tweet.User){
+	if !tweetManager.IsUserLoggedIn(tweet.GetUser()){
 		return -1, fmt.Errorf("user is not logged in")
 	}
 
-	if tweet.Text == "" {
+	if tweet.GetText() == "" {
 		return -1, fmt.Errorf("text is required")	
 	}
 
-	length := len(tweet.Text)
+	length := len(tweet.GetText())
 	if length > 140 {
 		return -1, fmt.Errorf("text exceeds 140 characters")
 	}
 
 	date := time.Now()
-	tweet.Date = &date
-	tweet.Id = tweetManager.NextId
+	tweet.SetDate(&date)
+	tweet.SetId(tweetManager.NextId)
 	tweetManager.NextId = tweetManager.NextId+1
 
 	tweetManager.Tweets = append(tweetManager.Tweets, tweet)
-	tweetManager.TweetsByUsers[tweet.User] = append(tweetManager.TweetsByUsers[tweet.User], tweet)
+	tweetManager.TweetsByUsers[tweet.GetUser()] = append(tweetManager.TweetsByUsers[tweet.GetUser()], tweet)
 
-	return tweet.Id, nil
+	return tweet.GetId(), nil
 }
 
-func (tweetManager *TweetManager)GetTweets() []*domain.Tweet {
+func (tweetManager *TweetManager)GetTweets() []domain.Tweet {
 	return tweetManager.Tweets;
 }
 
-func (tweetManager *TweetManager)GetTweetById(id int) *domain.Tweet {
-	var tweet *domain.Tweet
-	for i := 0; i < len(tweetManager.GetTweets()); i++ {
-		tweet = tweetManager.GetTweets()[i];
-		if(tweet.Id == id){
+func (tweetManager *TweetManager)GetTweetById(id int) domain.Tweet {
+	for _,tweet := range tweetManager.GetTweets() {
+		if(tweet.GetId() == id){
 			return tweet
 		}
 	}
 	return nil
 }
 
-func (tweetManager *TweetManager)GetTweetsByUser(user *domain.User) ([]*domain.Tweet, error) {
+func (tweetManager *TweetManager)GetTweetsByUser(user *domain.User) ([]domain.Tweet, error) {
 
 	userFound := tweetManager.GetUserWithNick(user.Nick)
 	if userFound == nil {
