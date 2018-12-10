@@ -37,4 +37,40 @@ func TestPublishedTweetIsSavedToExternalResource(t *testing.T) {
 	}
 }
 
+func BenchmarkPublishTweetWithFileTweetWriter(b *testing.B){
+	// Initialization
+	fileTweetWriter := service.NewFileTweetWriter()
+	tweetManager := service.NewTweetManager()
+	tweetManager.TweetWriter = fileTweetWriter
 
+	var tweet *domain.TextTweet
+	user := domain.NewUser("user", "user@mail.com", "userNick", "password")
+	tweetManager.AddUser(user)
+	tweetManager.Login(user.Nick, user.Pass)
+	text := "this is my first tweet"
+	tweet = domain.NewTextTweet(user, text)
+
+	// Operation
+	for n := 0; n < b.N; n++ {
+		tweetManager.PublishTweet(tweet)
+	}
+}
+
+func BenchmarkPublishTweetWithMemoryTweetWriter(b *testing.B){
+	// Initialization
+	fileTweetWriter := service.NewMemoryTweetWriter()
+	tweetManager := service.NewTweetManager()
+	tweetManager.TweetWriter = fileTweetWriter
+
+	var tweet *domain.TextTweet
+	user := domain.NewUser("user", "user@mail.com", "userNick", "password")
+	tweetManager.AddUser(user)
+	tweetManager.Login(user.Nick, user.Pass)
+	text := "this is my first tweet"
+	tweet = domain.NewTextTweet(user, text)
+
+	// Operation
+	for n := 0; n < b.N; n++ {
+		tweetManager.PublishTweet(tweet)
+	}
+}

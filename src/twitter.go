@@ -4,15 +4,26 @@ import (
 	"github.com/abiosoft/ishell"
 	"github.com/daniliberman/twitter/src/service"
 	"github.com/daniliberman/twitter/src/domain"
+	"github.com/daniliberman/twitter/src/rest"
 	"strconv"
 )
 
 func main() {
+	
+	
+	tweetManager := service.NewTweetManager()
+	var tweetWriter service.TweetWriter
+	tweetWriter = service.NewFileTweetWriter()
+	tweetManager.TweetWriter = tweetWriter
+
+	ginServer := rest.NewGinServer(tweetManager)
+	ginServer.StartGinServer()
+
 
 	shell := ishell.New()
 	shell.SetPrompt("Tweeter >> ")
 	shell.Print("Type 'help' to know commands\n")
-	tweetManager := service.NewTweetManager()
+	
 
 	shell.AddCmd(&ishell.Cmd{
 		Name: "publishTweet",

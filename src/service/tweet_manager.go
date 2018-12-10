@@ -112,3 +112,4 @@ func (tweetManager *TweetManager)SearchTweetsContaining(query string, searchResu
 		close(searchResult)
 	}()
 }
+
